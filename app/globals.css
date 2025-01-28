@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  @apply antialiased leading-relaxed transition-colors duration-300;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  @apply transition-colors duration-200;
+}
+/* a:hover {
+  @apply underline;
+} */
+
+.prose img {
+  @apply mx-auto;
+}
+
+.backlight-hover {
+  @apply transition-shadow duration-300;
+}
+
+.backlight-hover:hover {
+  @apply shadow-[0_0_10px_2px_rgba(56,189,248,0.3)]; /* sky-400 glow in light */
+}
+
+.backlight-hover:active {
+  @apply shadow-[0_0_6px_2px_rgba(56,189,248,0.3)];
+}
+
+/* In dark mode, do a subtle white glow */
+.dark .backlight-hover:hover {
+  @apply shadow-[0_0_10px_2px_rgba(255,255,255,0.15)];
+}
+
+.dark .backlight-hover:active {
+  @apply shadow-[0_0_6px_2px_rgba(255,255,255,0.15)];
+}
