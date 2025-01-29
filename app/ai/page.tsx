@@ -12,6 +12,7 @@ export const revalidate = 60;
 
 export default async function AIPage() {
     const aiContents = await getAIContents();
+    
 
     return (
         <section className="container mx-auto px-4 py-8">

@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import React from 'react';
 
 type BlogPostParams = {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 };
 
 // Generate static params for all blog posts (SSG)
@@ -15,7 +15,8 @@ export async function generateStaticParams() {
 
 // Dynamically generate the metadata for each post
 export async function generateMetadata({ params }: BlogPostParams): Promise<Metadata> {
-    const post = await getPostBySlug(params.slug);
+    const { slug } = await params; 
+    const post = await getPostBySlug(slug);
 
     if (!post) {
         return {
@@ -40,8 +41,9 @@ export async function generateMetadata({ params }: BlogPostParams): Promise<Meta
 }
 
 export default async function BlogPostPage({ params }: BlogPostParams) {
-    const post = await getPostBySlug(params.slug);
-
+    const { slug } = await params; 
+    const post = await getPostBySlug(slug);
+    
     if (!post) {
         return <div className="p-8 text-center">Post not found.</div>;
     }

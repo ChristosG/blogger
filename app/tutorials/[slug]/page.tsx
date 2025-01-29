@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import React from 'react';
 
 type TutorialParams = {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
@@ -13,7 +13,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: TutorialParams): Promise<Metadata> {
-    const tutorial = await getTutorialBySlug(params.slug);
+    const { slug } = await params; 
+    const tutorial = await getTutorialBySlug(slug);
     if (!tutorial) {
         return {
             title: 'Tutorial Not Found',
@@ -28,7 +29,8 @@ export async function generateMetadata({ params }: TutorialParams): Promise<Meta
 }
 
 export default async function TutorialPage({ params }: TutorialParams) {
-    const tutorial = await getTutorialBySlug(params.slug);
+    const { slug } = await params; 
+    const tutorial = await getTutorialBySlug(slug);
     if (!tutorial) {
         return <div className="p-8 text-center">Tutorial not found.</div>;
     }
