@@ -1,9 +1,10 @@
 // components/AITree.tsx
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef} from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { AIContent } from '@/types/ai-content'
+import { useScrollContext } from '@/context/ScrollContext';
 
 interface AITreeProps {
   contents: AIContent[]
@@ -14,6 +15,28 @@ export default function AITree({ contents, selectedSlug }: AITreeProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [isMounted, setIsMounted] = useState(false)
 
+  const { isHeaderVisible, setIsScrollingTree } = useScrollContext();
+  const treeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const treeContainer = treeRef.current;
+    if (!treeContainer) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      setIsScrollingTree(true);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => setIsScrollingTree(false), 100);
+    };
+
+    treeContainer.addEventListener('scroll', handleScroll);
+    return () => {
+      treeContainer.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutId);
+    };
+  }, [setIsScrollingTree]);
+
   useEffect(() => {
     setIsMounted(true)
     setExpandedCategories(prev => new Set(prev).add(selectedSlug))
@@ -22,7 +45,11 @@ export default function AITree({ contents, selectedSlug }: AITreeProps) {
   const toggleCategory = (slug: string) => {
     setExpandedCategories(prev => {
       const newSet = new Set(prev)
-      newSet.has(slug) ? newSet.delete(slug) : newSet.add(slug)
+      if (newSet.has(slug)) {
+        newSet.delete(slug)
+      } else {
+        newSet.add(slug)
+      }
       return newSet
     })
   }
@@ -30,7 +57,11 @@ export default function AITree({ contents, selectedSlug }: AITreeProps) {
   if (!isMounted) return null
 
   return (
-    <div className=" py-8 px-4 w-36 md:w-72 border-r border-gray-200 dark:border-gray-700 overflow-y-auto ai-tree overflow-x-hidden">
+    <div  ref={treeRef} className={`w-72 border-r border-gray-200 dark:border-gray-700 overflow-y-auto px-4 ai-tree ${
+        isHeaderVisible ? 'h-[calc(100vh-4rem)] py-4'  : 'h-screen py-0'
+      }`}>
+
+      
       {contents.map((content) => (
         <div key={content.slug} className="mb-1">
           <div className="flex items-start gap-1 group">

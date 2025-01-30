@@ -22,17 +22,17 @@ export default async function AICategoryPage({
   const currentContent = contents.find(c => c.slug === categorySlug)
 
   return (
-    <div className="w-full h-full flex flex-1 min-h-0 relative">
-      <MobileTreeToggle contents={contents} selectedSlug={categorySlug} />
+<div className="w-full  h-[calc(100vh-4rem)] flex ">
+<MobileTreeToggle contents={contents} selectedSlug={categorySlug} />
       
       {/* Desktop Tree */}
-      <div className="hidden md:block w-72 border-r border-gray-100 dark:border-gray-800 sticky top-0">
-        <AITree contents={contents} selectedSlug={categorySlug} />
+      <div className="hidden md:block">        <AITree contents={contents} selectedSlug={categorySlug} />
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 lg:p-8 overflow-y-auto bg-gradient-to-br from-gray-50/50 to-white/50 dark:from-gray-900/50 dark:to-gray-800/50">
-        <div className="max-w-5xl mx-auto">
+      <div id="main-scroll-container"
+        className="flex-1 overflow-y-auto p-6 lg:p-8 bg-gradient-to-br from-gray-50/50 to-white/50 dark:from-gray-900/50 dark:to-gray-800/50"
+      >    <div className="max-w-5xl mx-auto">
           <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
             {currentContent?.title}
           </h1>

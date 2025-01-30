@@ -1,12 +1,27 @@
+// app/providers/ThemeProvider.tsx
 'use client';
 
-import React from 'react';
 import { ThemeProvider } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <>{children}</>;
+  }
+
   return (
-    // 'attribute="class"' allows Tailwind to toggle dark mode via className
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider 
+      attribute="class" 
+      defaultTheme="system" 
+      enableSystem
+      disableTransitionOnChange
+    >
       {children}
     </ThemeProvider>
   );

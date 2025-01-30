@@ -10,7 +10,7 @@ export default function AIContentCard({ content }: { content: AIContent }) {
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="backlight-hover rounded-xl shadow-sm hover:shadow-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 transition-all duration-300"
+      className="backlight-hover rounded-xl  shadow-sm hover:shadow-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 transition-all duration-300"
     >
       <Link href={`/ai/${content.slug}`}>
         <div className="p-6">

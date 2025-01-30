@@ -37,13 +37,19 @@ export default function MobileTreeToggle({ contents, selectedSlug }: MobileTreeP
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            className="block fixed  border-r border-gray-100 
-            dark:border-gray-800 md:hidden overflow-y-auto overflow-x-hidden  z-40 bg-white dark:bg-gray-800 w-36 shadow-xl   "
-          >
-            <AITree  contents={contents} selectedSlug={selectedSlug} />
+          initial={{ x: '-100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '-100%' }}
+          className={`block relative h-full overflow-x-hidden border-r border-gray-100 dark:border-gray-800 md:hidden overflow-y-auto z-40 bg-white dark:bg-gray-800 w-72 shadow-xl`}
+
+//          className="block fixed h-[calc(100vh-8.3rem)] overflow-x-hidden top-16 
+//                      border-r border-gray-100 dark:border-gray-800 md:hidden overflow-y-auto
+//                       z-40 bg-white dark:bg-gray-800 w-72 shadow-xl"
+
+        >
+
+
+                <AITree  contents={contents} selectedSlug={selectedSlug} />
           </motion.div>
         )}
       </AnimatePresence>

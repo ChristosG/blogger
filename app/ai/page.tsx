@@ -17,7 +17,7 @@ export default async function AIPage() {
     
 
     return (
-        <section className="container mx-auto px-4 py-8">
+        <section className="container mx-auto px-4 py-8 overflow-y-auto">
             <h1 className="text-3xl font-bold mb-8">AI & Coding</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-8">
                 {aiContents.map((content) => (

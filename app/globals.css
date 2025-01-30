@@ -95,3 +95,69 @@ a {
 .prose code {
   @apply text-sm px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-700;
 }
+
+
+/* Custom Scrollbars */
+.ai-tree::-webkit-scrollbar { width: 6px; }
+.ai-tree::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-gray-600 rounded-full; }
+
+/* Gradient borders */
+.gradient-border-x {
+  position: relative;
+  &::before {
+    content: '';
+    @apply absolute inset-y-0 w-px bg-gradient-to-b from-transparent via-gray-200 to-transparent dark:via-gray-700;
+    left: -1px;
+  }
+}
+
+/* Backlight effect */
+.backlight-hover {
+  @apply transition-all duration-300;
+  &:hover {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+  }
+}
+
+/* Smooth header transitions */
+.motion-header {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scroll container styling */
+#scrollContainer {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Ensure proper scrolling containers */
+#main-scroll-container {
+  scroll-behavior: smooth;
+  overflow-anchor: none;
+  height: calc(100vh - 4rem);
+}
+
+.ai-tree {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.dark .ai-tree {
+  scrollbar-color: #374151 transparent;
+}
+
+@layer base {
+  body {
+    margin: 0;
+  }
+}
+
+/* globals.css */
+main {
+  transition: margin-top 0.3s ease-in-out;
+}
+
+[data-header-hidden] main {
+  margin-top: -4rem;
+  height: 100vh !important;
+}

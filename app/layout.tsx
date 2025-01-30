@@ -7,6 +7,7 @@ import React from 'react'
 import ClientLayout from '@/components/ClientLayout'
 import Footer from '../components/Footer'
 import Providers from './providers/ThemeProvider'
+import { ScrollProvider } from '@/context/ScrollContext';
 
 export const metadata: Metadata = {
   title: 'Coding Blog',
@@ -31,25 +32,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body
-        className="
-          flex flex-col
-          w-full min-h-screen
-          bg-[#E6E7EA] text-gray-900
-          dark:bg-[#171C26] dark:text-gray-100
-          transition-colors antialiased
-        "
-      >
+    <html lang="en" suppressHydrationWarning>
+      <body className="h-screen flex flex-col bg-[#E6E7EA] dark:bg-[#171C26]">
         <Providers>
-          <Header />
-          {/* Make sure ClientLayout does NOT center or max-width its children */}
-          <main className="flex-1 flex overflow-hidden">
-          <ClientLayout>{children}</ClientLayout> </main>
-          <Footer />
+          <ScrollProvider>
+            <Header />
+            <main className="flex-1 flex ">
+              <ClientLayout>{children}</ClientLayout>
+            </main>
+            <Footer />
+          </ScrollProvider>
         </Providers>
       </body>
     </html>
-  )
+  );
 }
-
