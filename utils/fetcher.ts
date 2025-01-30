@@ -1,131 +1,151 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import type { AIContent, Post } from '@/types/ai-content';
 
 const postsDir = path.join(process.cwd(), 'data', 'posts');
 const tutorialsDir = path.join(process.cwd(), 'data', 'tutorials');
 const aiDir = path.join(process.cwd(), 'data', 'ai');
 
-// ---------------------
 // Public API
-// ---------------------
-export async function getPosts() {
+export async function getPosts(): Promise<AIContent[]> {
     return getFiles(postsDir);
 }
 
-export async function getTutorials() {
+export async function getTutorials(): Promise<AIContent[]> {
     return getFiles(tutorialsDir);
 }
 
-export async function getAIContents() {
+export async function getAIContents(): Promise<AIContent[]> {
     return getFiles(aiDir);
 }
 
-// export async function getPostBySlug(slug: string) {
-//     return getFileBySlug(postsDir, slug);
-// }
-
-export async function getTutorialBySlug(slug: string) {
+export async function getTutorialBySlug(slug: string): Promise<AIContent | null> {
     return getFileBySlug(tutorialsDir, slug);
 }
 
-interface ItemsContent {
-    slug: string;
-    title: string;
-    description: string;
-    content: string;
-    date?: Date;
-    image?:string;
-}
-
-export async function getAIContentBySlug(slug: string): Promise<ItemsContent | null>  {
-    return getFileBySlug(aiDir, slug);
-}
-
-
-interface BlogPostParams {
-    slug: string;
-    image: string;
-    title: string;
-    description: string;
-    content: string;
-    date?: Date;
-}
-export async function getPostBySlug(slug: string): Promise<ItemsContent | null> {
+export async function getPostBySlug(slug: string): Promise<AIContent | null> {
     return getFileBySlug(postsDir, slug);
 }
 
-
-// ---------------------
-// Internals
-// ---------------------
-
-// Update the getFiles function in fetcher.ts
-function getFiles(dirPath: string): ItemsContent[] {
-    const files = fs.readdirSync(dirPath);
-
-    return files.map((file) => {
-        const filePath = path.join(dirPath, file);
-        const { data, content } = matter(fs.readFileSync(filePath, 'utf-8'));
-        const slug = file.replace(/\.md$/, '');
-        
-        // Convert date string to Date object
-        const date = new Date(data.date);
-        
-        return {
-            slug,
-            title: data.title,
-            description: data.description,
-            content,
-            date
-        };
-    });
+// Internal functions
+function getFiles(dirPath: string): AIContent[] {
+  const items = fs.readdirSync(dirPath, { withFileTypes: true });
+  
+  return items.flatMap(item => {
+      const itemPath = path.join(dirPath, item.name);
+      
+      if (item.isDirectory()) {
+          // Process category directory
+          const categoryPosts = getPostsInDirectory(itemPath);
+          const categoryMeta = getCategoryMetadata(itemPath);
+          
+          return [{
+              slug: item.name,
+              title: categoryMeta.title || item.name,
+              description: categoryMeta.description || '',
+              posts: categoryPosts,
+              image: categoryMeta.image,
+              date: categoryMeta.date
+          } as AIContent];
+      }
+      
+      if (item.name.endsWith('.md')) {
+          // Process individual post (top-level markdown file)
+          const post = parseMarkdownFile(itemPath);
+          return post ? [{
+              slug: post.slug,
+              title: post.title,
+              description: post.description,
+              content: post.content,
+              date: post.date
+          }] : [];
+      }
+      
+      return [];
+  });
 }
 
-// function getFiles(dirPath: string) {
-//     const files = fs.readdirSync(dirPath);
+// New helper function for category metadata
+function getCategoryMetadata(dirPath: string): Partial<AIContent> {
+  const indexPath = path.join(dirPath, 'index.md');
+  if (!fs.existsSync(indexPath)) return {};
+  
+  const fileContent = fs.readFileSync(indexPath, 'utf-8');
+  const { data } = matter(fileContent);
+  
+  return {
+      title: data.title,
+      description: data.description,
+      image: data.image,
+      date: data.date ? new Date(data.date) : undefined
+  };
+}
 
-//     return files.map((file) => {
-//         const filePath = path.join(dirPath, file);
-//         const { data, content } = matter(fs.readFileSync(filePath, 'utf-8'));
-//         const slug = file.replace(/\.md$/, '');
-//         return {
-//             slug,
-//             ...data,
-//             content,
-//         };
-//     });
-// }
+// New helper function for category posts
+function getPostsInDirectory(dirPath: string): Post[] {
+  return fs.readdirSync(dirPath)
+      .filter(file => file.endsWith('.md') && file !== 'index.md')
+      .map(file => {
+          const postPath = path.join(dirPath, file);
+          const result = parseMarkdownFile(postPath);
+          return result ? {
+              slug: result.slug,
+              title: result.title,
+              description: result.description,
+              content: result.content || '',
+              date: result.date
+          } : null;
+      })
+      .filter((post) => post !== null) as Post[];
+}
 
-function getFileBySlug(dirPath: string, slug: string): ItemsContent | null {
+// Generic markdown parser
+function parseMarkdownFile(filePath: string) {
+  try {
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const { data, content } = matter(fileContent);
+      
+      return {
+          slug: path.basename(filePath, '.md'),
+          title: data.title || path.basename(filePath, '.md'),
+          description: data.description || '',
+          content,
+          date: data.date ? new Date(data.date) : undefined,
+          image: data.image
+      };
+  } catch (error) {
+      console.error(`Error parsing ${filePath}:`, error);
+      return null;
+  }
+}
+
+export async function getAIContentBySlug(categorySlug: string, postSlug?: string): Promise<AIContent | null> {
+    const categoryPath = path.join(aiDir, categorySlug);
+    
+    if (postSlug) {
+        const postPath = path.join(categoryPath, `${postSlug}.md`);
+        if (!fs.existsSync(postPath)) return null;
+        return getFileBySlug(categoryPath, postSlug);
+    }
+
+    const indexPath = path.join(categoryPath, 'index.md');
+    if (!fs.existsSync(indexPath)) return null;
+    return getFileBySlug(categoryPath, 'index');
+}
+
+function getFileBySlug(dirPath: string, slug: string): AIContent | null {
     const filePath = path.join(dirPath, `${slug}.md`);
     if (!fs.existsSync(filePath)) return null;
 
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const { data, content } = matter(fileContent);
 
-    // Convert date string to Date object
-    const date = new Date(data.date);
-
     return {
         slug,
         title: data.title,
         description: data.description,
         content,
-        date
+        date: data.date ? new Date(data.date) : undefined
     };
 }
-
-// function getFileBySlug(dirPath: string, slug: string) {
-//     const filePath = path.join(dirPath, `${slug}.md`);
-//     if (!fs.existsSync(filePath)) return null;
-
-//     const fileContent = fs.readFileSync(filePath, 'utf-8');
-//     const { data, content } = matter(fileContent);
-
-//     return {
-//         slug,
-//         ...data,
-//         content,
-//     };
-// }

@@ -18,7 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             duration: 0.4, ease:"easeInOut",
             scale: { type: "spring", visualDuration: 0.5, bounce: 0.4 },
         }}
-        className="flex-grow max-w-screen-lg w-full mx-auto px-4 py-8"
+        className="w-full flex-1"
       >
         {children}
       </motion.main>

@@ -1,3 +1,5 @@
+//../app/ai/page.tsx:
+
 import type { Metadata } from 'next';
 import { getAIContents } from '@/utils/fetcher';
 import AIContentCard from '../../components/AIContentCard';
